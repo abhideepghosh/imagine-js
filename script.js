@@ -31,8 +31,21 @@ window.addEventListener("load", function () {
       this.effect.context.fillRect(this.x, this.y, this.size, this.size);
     }
     update() {
-      this.x += (this.originX - this.x) * this.ease;
-      this.y += (this.originY - this.y) * this.ease;
+      this.dx = this.effect.mouse.x - this.x;
+      this.dy = this.effect.mouse.y - this.y;
+      this.distance = this.dx * this.dx + this.dy * this.dy;
+      this.force = -this.effect.mouse.radius / this.distance;
+
+      if (this.distance < this.effect.mouse.radius) {
+        this.angle = Math.atan2(this.dy, this.dx);
+        this.vx += this.force * Math.cos(this.angle);
+        this.vy += this.force * Math.sin(this.angle);
+      }
+
+      this.x +=
+        (this.vx *= this.friction) + (this.originX - this.x) * this.ease;
+      this.y +=
+        (this.vy *= this.friction) + (this.originY - this.y) * this.ease;
     }
   }
 
@@ -43,10 +56,11 @@ window.addEventListener("load", function () {
       this.canvasHeight = canvasHeight;
       this.textX = this.canvasWidth / 2;
       this.textY = this.canvasHeight / 2;
-      this.fontSize = 130;
+      this.fontSize = 140;
       this.maxTextWidth = this.canvasWidth * 0.8;
-      this.lineHeight = this.fontSize * 0.9;
+      this.lineHeight = this.fontSize * 1.1;
       this.textInput = document.getElementById("textInput");
+      this.verticalOffset = 0;
       this.textInput.addEventListener("keyup", (e) => {
         if (e.key !== " ") {
           this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -74,13 +88,14 @@ window.addEventListener("load", function () {
         this.canvasHeight
       );
       gradient.addColorStop(0.3, "red");
-      gradient.addColorStop(0.5, "fuchsia");
-      gradient.addColorStop(0.7, "purple");
+      gradient.addColorStop(0.5, "magenta");
+      gradient.addColorStop(0.7, "yellow");
       this.context.fillStyle = gradient;
       this.context.textAlign = "center";
       this.context.textBaseline = "middle";
       this.context.lineWidth = 3;
-      this.context.strokeStyle = "white";
+      this.context.strokeStyle = "orange";
+      // this.context.letterSpacing = "5px";
       this.context.font = this.fontSize + "px Helvetica";
 
       // Break Multiline Text
@@ -100,18 +115,18 @@ window.addEventListener("load", function () {
       }
       // console.log(linesArray);
       let textHeight = this.lineHeight * lineCounter;
-      this.textY = this.canvasHeight / 2 - textHeight / 2;
+      this.textY = this.canvasHeight / 2 - textHeight / 2 + this.verticalOffset;
       linesArray.forEach((el, index) => {
         this.context.fillText(
           el,
           this.textX,
           this.textY + index * this.lineHeight
         );
-        this.context.strokeText(
-          el,
-          this.textX,
-          this.textY + index * this.lineHeight
-        );
+        // this.context.strokeText(
+        //   el,
+        //   this.textX,
+        //   this.textY + index * this.lineHeight
+        // );
       });
       this.convertToParticles();
     }
