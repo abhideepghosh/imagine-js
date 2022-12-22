@@ -1,7 +1,9 @@
 window.addEventListener("load", function () {
   /*----- Canvas Setup -----*/
   const canvas = document.querySelector("#canvas1");
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -56,7 +58,7 @@ window.addEventListener("load", function () {
       this.canvasHeight = canvasHeight;
       this.textX = this.canvasWidth / 2;
       this.textY = this.canvasHeight / 2;
-      this.fontSize = 140;
+      this.fontSize = 110;
       this.maxTextWidth = this.canvasWidth * 0.8;
       this.lineHeight = this.fontSize * 1.1;
       this.textInput = document.getElementById("textInput");
@@ -96,7 +98,7 @@ window.addEventListener("load", function () {
       this.context.lineWidth = 3;
       this.context.strokeStyle = "orange";
       // this.context.letterSpacing = "5px";
-      this.context.font = this.fontSize + "px Helvetica";
+      this.context.font = this.fontSize + "px Bangers";
 
       // Break Multiline Text
       let linesArray = [];
@@ -159,11 +161,18 @@ window.addEventListener("load", function () {
         particle.draw();
       });
     }
+    resize(width, height) {
+      this.canvasWidth = width;
+      this.canvasHeight = height;
+      this.textX = this.canvasWidth / 2;
+      this.textY = this.canvasHeight / 2;
+      this.maxTextWidth = this.canvasWidth * 0.8;
+    }
   }
 
   const effect = new Effect(ctx, canvas.width, canvas.height);
   // console.log(effect);
-  effect.wrapText("Hello how are you");
+  effect.wrapText(effect.textInput.placeholder);
   effect.render();
 
   const animate = () => {
@@ -172,4 +181,15 @@ window.addEventListener("load", function () {
     this.requestAnimationFrame(animate);
   };
   animate();
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    effect.resize(canvas.width, canvas.height);
+    effect.wrapText(
+      effect.textInput.value
+        ? effect.textInput.value
+        : effect.textInput.placeholder
+    );
+  });
 });
