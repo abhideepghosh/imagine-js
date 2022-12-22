@@ -30,6 +30,18 @@ window.addEventListener("load", function () {
           this.wrapText(e.target.value);
         }
       });
+      // Particle Text
+      this.particles = [];
+      this.gap = 3;
+      this.mouse = {
+        radius: 20000,
+        x: 0,
+        y: 0,
+      };
+      window.addEventListener("mousemove", (e) => {
+        this.mouse.x = e.x;
+        this.mouse.y = e.y;
+      });
     }
     wrapText(text) {
       const gradient = this.context.createLinearGradient(
@@ -63,7 +75,7 @@ window.addEventListener("load", function () {
         }
         linesArray[lineCounter] = line;
       }
-      console.log(linesArray);
+      // console.log(linesArray);
       let textHeight = this.lineHeight * lineCounter;
       this.textY = this.canvasHeight / 2 - textHeight / 2;
       linesArray.forEach((el, index) => {
@@ -78,13 +90,35 @@ window.addEventListener("load", function () {
           this.textY + index * this.lineHeight
         );
       });
+      this.convertToParticles();
     }
-    convertToParticles() {}
+    convertToParticles() {
+      this.particles = [];
+      const pixels = this.context.getImageData(
+        0,
+        0,
+        this.canvasWidth,
+        this.canvasHeight
+      ).data;
+
+      for (let y = 0; y < this.canvasHeight; y += this.gap) {
+        for (let x = 0; x < this.canvasWidth; x += this.gap) {
+          const index = (y * this.canvasWidth + x) * 4;
+          const alpha = pixels[index + 3];
+          if (alpha > 0) {
+            const red = pixels[index];
+            const green = pixels[index + 1];
+            const blue = pixels[index + 2];
+            const color = "rgb(" + red + "," + green + "," + blue + ")";
+          }
+        }
+      }
+    }
     render() {}
   }
 
   const effect = new Effect(ctx, canvas.width, canvas.height);
-  console.log(effect);
+  // console.log(effect);
   effect.wrapText("Hello how are you");
 
   const animate = () => {};
